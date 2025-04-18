@@ -27,13 +27,13 @@ module FubClient
       @her_api.setup url: self.api_uri.to_s do |c|
         # Request
         c.use FubClient::Middleware::Authentication
-        c.use Faraday::Request::UrlEncoded
+        c.request :url_encoded
       
         # Response
         c.use FubClient::Middleware::Parser
       
         # Adapter
-        c.use Faraday::Adapter::NetHttp
+        c.adapter :net_http
       end
     end
   end

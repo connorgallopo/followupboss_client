@@ -1,9 +1,15 @@
 # Libs
 require 'base64'
 require 'singleton'
+require 'logger'
+require 'active_support'
+require 'active_support/all'
+require 'active_support/core_ext/hash/keys'
 require 'faraday'
-require 'her'
 require 'facets/string/snakecase'
+require 'multi_json'
+# require 'fub_client/compatibility'
+require 'her'
 
 # App
 require "fub_client/version"
