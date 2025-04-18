@@ -65,6 +65,23 @@ success = test_endpoint(FubClient::User) && success
 # Test Events endpoint
 success = test_endpoint(FubClient::Event) && success
 
+# Test newly added endpoints
+puts "\n===================================="
+puts "Testing newly added endpoints..."
+puts "===================================="
+
+# Test Tasks endpoint
+success = test_endpoint(FubClient::Task, "tasks") && success
+
+# Test Properties endpoint
+success = test_endpoint(FubClient::Property, "properties") && success
+
+# Test Deals endpoint
+success = test_endpoint(FubClient::Deal, "deals") && success
+
+# Test Messages endpoint
+success = test_endpoint(FubClient::Message, "messages") && success
+
 # Test pagination with Events
 puts "\n===================================="
 puts "Testing FubClient::Event.by_page (pagination)..."
