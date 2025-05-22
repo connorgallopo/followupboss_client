@@ -14,7 +14,9 @@ require 'her'
 # App
 require "fub_client/version"
 require "fub_client/client"
+require "fub_client/cookie_client"
 require "fub_client/middleware"
+require "fub_client/middleware/cookie_authentication"
 require "fub_client/resource"
 # App Models
 require "fub_client/event"
@@ -47,6 +49,7 @@ require "fub_client/appointment_type"
 require "fub_client/appointment_outcome"
 require "fub_client/identity"
 require "fub_client/team_inbox"
+require "fub_client/shared_inbox"
 
 module FubClient
   def self.root
