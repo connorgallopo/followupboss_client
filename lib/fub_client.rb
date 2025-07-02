@@ -5,6 +5,7 @@ require 'logger'
 require 'active_support'
 require 'active_support/all'
 require 'active_support/core_ext/hash/keys'
+require 'fub_client/rails8_patch'  # Must be loaded after ActiveSupport but before Her
 require 'faraday'
 require 'facets/string/snakecase'
 require 'multi_json'
