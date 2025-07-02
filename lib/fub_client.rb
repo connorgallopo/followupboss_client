@@ -23,6 +23,40 @@ end
 require 'facets/string/snakecase'
 require 'multi_json'
 require 'fub_client/compatibility'
+
+# Monkey patch Her gem to work with Faraday 2.x before requiring it
+module Her
+  module Middleware
+    class ParseJSON < Faraday::Middleware
+      def initialize(app, options = {})
+        super(app)
+        @options = options
+      end
+
+      def on_complete(env)
+        if process_response_type?(env[:response_headers]['content-type'])
+          env[:body] = parse(env[:body])
+        end
+      end
+
+      private
+
+      def parse(body)
+        MultiJson.load(body, symbolize_keys: true)
+      rescue MultiJson::ParseError => e
+        {
+          error: "JSON parsing error: #{e.message}",
+          body: body
+        }
+      end
+
+      def process_response_type?(content_type)
+        content_type && content_type.match(/application\/json/)
+      end
+    end
+  end
+end
+
 require 'her'
 
 # App
