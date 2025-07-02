@@ -9,13 +9,12 @@ require 'fub_client/rails8_patch'  # Must be loaded after ActiveSupport but befo
 require 'faraday'
 # Apply Faraday compatibility patch after Faraday is loaded
 if defined?(Faraday) && !defined?(Faraday::Response::Middleware)
-  module Faraday
-    module Response
-      class Middleware < Faraday::Middleware
-        def initialize(app, options = {})
-          super(app)
-          @options = options
-        end
+  # In Faraday 2.x, Response is a class, not a module, so we need to reopen it
+  Faraday::Response.class_eval do
+    class Middleware < Faraday::Middleware
+      def initialize(app, options = {})
+        super(app)
+        @options = options
       end
     end
   end
