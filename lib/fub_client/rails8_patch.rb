@@ -31,3 +31,17 @@ rescue NameError
     puts "[FubClient] Created ActiveSupport::BasicObject from ProxyObject"
   end
 end
+
+# Third, apply Faraday compatibility patch if Faraday is already loaded
+if defined?(Faraday) && !defined?(Faraday::Response::Middleware)
+  # In Faraday 2.x, Response is a class, not a module, so we need to reopen it
+  Faraday::Response.class_eval do
+    class Middleware < Faraday::Middleware
+      def initialize(app, options = {})
+        super(app)
+        @options = options
+      end
+    end
+  end
+  puts "[FubClient] Created Faraday::Response::Middleware for Her gem compatibility"
+end

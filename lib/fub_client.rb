@@ -5,9 +5,9 @@ require 'logger'
 require 'active_support'
 require 'active_support/all'
 require 'active_support/core_ext/hash/keys'
-require 'fub_client/rails8_patch'  # Must be loaded after ActiveSupport but before Her
 require 'faraday'
-# Apply Faraday compatibility patch after Faraday is loaded
+require 'fub_client/rails8_patch'  # Must be loaded after ActiveSupport and Faraday but before Her
+# Apply Faraday compatibility patch after Faraday is loaded (second attempt if not applied in patch file)
 if defined?(Faraday) && !defined?(Faraday::Response::Middleware)
   # In Faraday 2.x, Response is a class, not a module, so we need to reopen it
   Faraday::Response.class_eval do
@@ -18,7 +18,7 @@ if defined?(Faraday) && !defined?(Faraday::Response::Middleware)
       end
     end
   end
-  puts "[FubClient] Created Faraday::Response::Middleware for Her gem compatibility"
+  puts "[FubClient] Created Faraday::Response::Middleware for Her gem compatibility (second attempt)"
 end
 require 'facets/string/snakecase'
 require 'multi_json'
