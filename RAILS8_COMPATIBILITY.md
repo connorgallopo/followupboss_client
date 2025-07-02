@@ -16,9 +16,10 @@ The following dependencies were updated to support Rails 8:
 
 ### Compatibility Fixes
 
-Added `lib/fub_client/compatibility.rb` to address Rails 8 breaking changes:
+Added `lib/fub_client/rails8_patch.rb` to address Rails 8 and modern dependency breaking changes:
 
-- **Her Gem Fix**: Rails 8 removed `ActiveSupport::BasicObject`, but the Her gem still references it. Our compatibility layer creates an alias to `ActiveSupport::ProxyObject` to maintain functionality.
+- **ActiveSupport::BasicObject Fix**: Rails 8 removed `ActiveSupport::BasicObject`, but the Her gem still references it. Our compatibility layer creates an alias to `ActiveSupport::ProxyObject` to maintain functionality.
+- **Faraday::Response::Middleware Fix**: Faraday 2.x removed `Faraday::Response::Middleware`, but the Her gem still references it. Our compatibility layer recreates this class to maintain Her gem functionality.
 
 ### Backward Compatibility
 

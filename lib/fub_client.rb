@@ -7,6 +7,20 @@ require 'active_support/all'
 require 'active_support/core_ext/hash/keys'
 require 'fub_client/rails8_patch'  # Must be loaded after ActiveSupport but before Her
 require 'faraday'
+# Apply Faraday compatibility patch after Faraday is loaded
+if defined?(Faraday) && !defined?(Faraday::Response::Middleware)
+  module Faraday
+    module Response
+      class Middleware < Faraday::Middleware
+        def initialize(app, options = {})
+          super(app)
+          @options = options
+        end
+      end
+    end
+  end
+  puts "[FubClient] Created Faraday::Response::Middleware for Her gem compatibility"
+end
 require 'facets/string/snakecase'
 require 'multi_json'
 require 'fub_client/compatibility'
