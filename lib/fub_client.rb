@@ -8,7 +8,7 @@ require 'active_support/core_ext/hash/keys'
 require 'faraday'
 require 'facets/string/snakecase'
 require 'multi_json'
-# require 'fub_client/compatibility'
+require 'fub_client/compatibility'
 require 'her'
 
 # App

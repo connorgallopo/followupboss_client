@@ -14,6 +14,12 @@ The following dependencies were updated to support Rails 8:
 - `activemodel`: Changed from `~> 7.1.0` to `>= 7.1.0, < 9.0`
 - `faraday`: Changed from `~> 1.10.3` to `>= 1.10.3, < 3.0`
 
+### Compatibility Fixes
+
+Added `lib/fub_client/compatibility.rb` to address Rails 8 breaking changes:
+
+- **Her Gem Fix**: Rails 8 removed `ActiveSupport::BasicObject`, but the Her gem still references it. Our compatibility layer creates an alias to `ActiveSupport::ProxyObject` to maintain functionality.
+
 ### Backward Compatibility
 
 The gem maintains backward compatibility with:

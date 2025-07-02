@@ -1,11 +1,19 @@
-module ActiveSupport
-  # Define BasicObject if it doesn't exist for Her gem compatibility
-  unless const_defined?(:BasicObject)
-    if const_defined?(:ProxyObject)
-      BasicObject = ProxyObject
-    else
-      # Fallback to Ruby's BasicObject if neither is available
-      BasicObject = ::BasicObject
+# Compatibility fixes for Rails 8
+module FubClient
+  module Compatibility
+    # Fix for Her gem's ActiveSupport::BasicObject usage in Rails 8+
+    # ActiveSupport::BasicObject was removed in Rails 8, but Her gem still references it
+    def self.patch_her_gem_rails8_compatibility!
+      return unless defined?(Her)
+      
+      # Only patch if ActiveSupport::BasicObject is not defined (Rails 8+)
+      unless ActiveSupport.const_defined?('BasicObject')
+        # Define BasicObject as an alias to ProxyObject for backward compatibility
+        ActiveSupport.const_set('BasicObject', ActiveSupport::ProxyObject)
+      end
     end
   end
 end
+
+# Apply the patch when this file is loaded
+FubClient::Compatibility.patch_her_gem_rails8_compatibility!
