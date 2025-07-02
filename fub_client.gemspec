@@ -28,11 +28,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "her", "~> 1.1.1"
-  spec.add_dependency "faraday", "~> 1.10.3"
+  spec.add_dependency "faraday", ">= 1.10.3", "< 3.0"
   spec.add_dependency "facets", "~> 3.1.0"
   spec.add_dependency "multi_json", "~> 1.15.0"
-  spec.add_dependency "activesupport", "~> 7.1.0"
-  spec.add_dependency "activemodel", "~> 7.1.0"
+  spec.add_dependency "activesupport", ">= 7.1.0", "< 9.0"
+  spec.add_dependency "activemodel", ">= 7.1.0", "< 9.0"
   spec.add_dependency "tzinfo", "~> 2.0.6"
   spec.add_dependency "logger"
   # Developemnt
