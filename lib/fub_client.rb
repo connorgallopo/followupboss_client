@@ -15,6 +15,7 @@ require 'her'
 
 # App
 require "fub_client/version"
+require "fub_client/configuration"
 require "fub_client/client"
 require "fub_client/cookie_client"
 require "fub_client/middleware"
