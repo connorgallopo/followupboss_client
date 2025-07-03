@@ -1,17 +1,18 @@
-# FubClient
+# FollowUpBoss Client
 
 [![Ruby](https://img.shields.io/badge/ruby-%3E%3D%202.7-red.svg)](https://www.ruby-lang.org/)
-[![Rails](https://img.shields.io/badge/rails-%3E%3D%206.0-red.svg)](https://rubyonrails.org/)
+[![Rails](https://img.shields.io/badge/rails-%3E%3D%207.1-red.svg)](https://rubyonrails.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
+[![Gem Version](https://badge.fury.io/rb/followupboss_client.svg)](https://badge.fury.io/rb/followupboss_client)
 
 A comprehensive Ruby client for the [Follow Up Boss API](https://api.followupboss.com/api-documentation/). This gem provides Rails-like models and methods for seamless integration with Follow Up Boss CRM.
 
-**Enhanced Fork Features:**
-- 🚀 Rails 8 compatibility
+**Enhanced Features:**
+- 🚀 Rails 8 compatibility with automatic patches
 - 🔐 Secure cookie authentication for SharedInbox
 - 📧 Advanced inbox management
 - 🛡️ Security-first architecture
-- 📱 Comprehensive API coverage
+- 📱 Comprehensive API coverage (25+ resources)
 
 ## Table of Contents
 
@@ -40,12 +41,10 @@ A comprehensive Ruby client for the [Follow Up Boss API](https://api.followupbos
 
 ## Installation
 
-**Note: This is an enhanced fork with additional features and Rails 8 compatibility.**
-
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'fub_client', git: 'https://github.com/gallopo-solutions/fub_client.git'
+gem 'followupboss_client'
 ```
 
 And then execute:
@@ -54,17 +53,16 @@ And then execute:
 $ bundle install
 ```
 
-Or install directly from GitHub:
+Or install it directly:
 
 ```bash
-$ gem install specific_install
-$ gem specific_install https://github.com/gallopo-solutions/fub_client.git
+$ gem install followupboss_client
 ```
 
 ## Quick Start
 
 ```ruby
-require 'fub_client'
+require 'followupboss_client'
 
 # Configure with API key
 FubClient.configure do |config|
@@ -814,8 +812,8 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 ```bash
 # Setup development environment
-git clone https://github.com/gallopo-solutions/fub_client.git
-cd fub_client
+git clone https://github.com/connorgallopo/followupboss_client.git
+cd followupboss_client
 bin/setup
 
 # Run tests
@@ -876,8 +874,8 @@ The gem is available as open source under the terms of the [MIT License](http://
 
 - [Follow Up Boss API Documentation](https://api.followupboss.com/api-documentation/)
 - [Follow Up Boss Website](https://www.followupboss.com)
-- [GitHub Repository](https://github.com/gallopo-solutions/fub_client)
-- [Issue Tracker](https://github.com/gallopo-solutions/fub_client/issues)
+- [GitHub Repository](https://github.com/connorgallopo/followupboss_client)
+- [Issue Tracker](https://github.com/connorgallopo/followupboss_client/issues)
 
 ---
 

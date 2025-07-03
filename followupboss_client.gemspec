@@ -3,14 +3,14 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'fub_client/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'fub_client'
+  spec.name          = 'followupboss_client'
   spec.version       = FubClient::VERSION
-  spec.authors       = ['Kyoto Kopz', 'Connor Gallopo']
+  spec.authors       = ['Connor Gallopo', 'Kyoto Kopz']
   spec.email         = ['connor.gallopo@me.com']
 
   spec.summary       = 'Enhanced Ruby client for Follow Up Boss API with Rails 8 compatibility'
   spec.description   = 'A comprehensive Ruby client for the Follow Up Boss API with Rails 8 compatibility, secure cookie authentication for SharedInbox, and enhanced features for real estate CRM integration.'
-  spec.homepage      = 'https://github.com/gallopo-solutions/fub_client'
+  spec.homepage      = 'https://github.com/connorgallopo/followupboss_client'
   spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
