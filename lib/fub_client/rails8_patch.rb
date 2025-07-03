@@ -5,7 +5,7 @@ unless defined?(ActiveSupport::ProxyObject)
   begin
     if defined?(ActiveSupport::BasicObject)
       ActiveSupport.const_set('ProxyObject', ActiveSupport::BasicObject)
-      puts "[FubClient] Created ActiveSupport::ProxyObject from BasicObject"
+      puts '[FubClient] Created ActiveSupport::ProxyObject from BasicObject'
     else
       ActiveSupport.const_set('ProxyObject', BasicObject)
       puts "[FubClient] Created ActiveSupport::ProxyObject from Ruby's BasicObject"
@@ -21,7 +21,7 @@ begin
 rescue NameError
   if defined?(ActiveSupport::ProxyObject)
     ActiveSupport.const_set('BasicObject', ActiveSupport::ProxyObject)
-    puts "[FubClient] Created ActiveSupport::BasicObject from ProxyObject"
+    puts '[FubClient] Created ActiveSupport::BasicObject from ProxyObject'
   end
 end
 
@@ -35,5 +35,5 @@ if defined?(Faraday) && !defined?(Faraday::Response::Middleware)
       end
     end
   end
-  puts "[FubClient] Created Faraday::Response::Middleware for Her gem compatibility"
+  puts '[FubClient] Created Faraday::Response::Middleware for Her gem compatibility'
 end

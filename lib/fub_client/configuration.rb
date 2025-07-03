@@ -20,7 +20,7 @@ module FubClient
 
     def has_cookie_auth?
       (!@cookie.nil? && !@cookie.empty?) ||
-      (!@gist_url.nil? && !@gist_url.empty? && !@encryption_key.nil? && !@encryption_key.empty?)
+        (!@gist_url.nil? && !@gist_url.empty? && !@encryption_key.nil? && !@encryption_key.empty?)
     end
 
     def auth_summary
@@ -32,7 +32,7 @@ module FubClient
           summary << "  - Direct cookie: #{@cookie.length} chars"
         elsif @gist_url && @encryption_key
           summary << "  - GIST URL: #{@gist_url}"
-          summary << "  - Encryption key: configured"
+          summary << '  - Encryption key: configured'
         end
         summary << "  - Subdomain: #{@subdomain || 'not set'}"
       end

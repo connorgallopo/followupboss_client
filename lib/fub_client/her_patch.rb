@@ -7,9 +7,9 @@ if defined?(Faraday) && !defined?(Faraday::Response::Middleware)
       @options = options
     end
   end
-  
+
   Faraday::Response.const_set('Middleware', middleware_class)
-  puts "[FubClient] Created Faraday::Response::Middleware using const_set"
+  puts '[FubClient] Created Faraday::Response::Middleware using const_set'
 end
 
 original_require = method(:require)
@@ -26,9 +26,9 @@ define_method(:require) do |name|
           end
 
           def on_complete(env)
-            if process_response_type?(env[:response_headers]['content-type'])
-              env[:body] = parse(env[:body])
-            end
+            return unless process_response_type?(env[:response_headers]['content-type'])
+
+            env[:body] = parse(env[:body])
           end
 
           private
@@ -43,12 +43,12 @@ define_method(:require) do |name|
           end
 
           def process_response_type?(content_type)
-            content_type && content_type.match(/application\/json/)
+            content_type && content_type.match(%r{application/json})
           end
         end
       end
     end
-    puts "[FubClient] Intercepted and replaced her/middleware/parse_json"
+    puts '[FubClient] Intercepted and replaced her/middleware/parse_json'
     true
   when 'her/middleware/first_level_parse_json'
     module Her
@@ -60,9 +60,9 @@ define_method(:require) do |name|
           end
 
           def on_complete(env)
-            if process_response_type?(env[:response_headers]['content-type'])
-              env[:body] = parse(env[:body])
-            end
+            return unless process_response_type?(env[:response_headers]['content-type'])
+
+            env[:body] = parse(env[:body])
           end
 
           private
@@ -77,27 +77,25 @@ define_method(:require) do |name|
           end
 
           def process_response_type?(content_type)
-            content_type && content_type.match(/application\/json/)
+            content_type && content_type.match(%r{application/json})
           end
         end
       end
     end
-    puts "[FubClient] Intercepted and replaced her/middleware/first_level_parse_json"
+    puts '[FubClient] Intercepted and replaced her/middleware/first_level_parse_json'
     true
-  when /^her\/middleware\//
+  when %r{^her/middleware/}
     begin
       original_require.call(name)
     rescue NameError => e
-      if e.message.include?('Faraday::Response::Middleware')
-        puts "[FubClient] Skipped loading #{name} due to Faraday::Response::Middleware error"
-        true
-      else
-        raise e
-      end
+      raise e unless e.message.include?('Faraday::Response::Middleware')
+
+      puts "[FubClient] Skipped loading #{name} due to Faraday::Response::Middleware error"
+      true
     end
   else
     original_require.call(name)
   end
 end
 
-puts "[FubClient] Applied Her gem require interception patches"
+puts '[FubClient] Applied Her gem require interception patches'

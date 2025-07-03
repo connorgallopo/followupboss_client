@@ -5,10 +5,10 @@ module FubClient
     # ActiveSupport::BasicObject was removed in Rails 8, but Her gem still references it
     def self.patch_her_gem_rails8_compatibility!
       # Only patch if ActiveSupport::BasicObject is not defined (Rails 8+)
-      unless ActiveSupport.const_defined?('BasicObject')
-        # Define BasicObject as an alias to ProxyObject for backward compatibility
-        ActiveSupport.const_set('BasicObject', ActiveSupport::ProxyObject)
-      end
+      return if ActiveSupport.const_defined?('BasicObject')
+
+      # Define BasicObject as an alias to ProxyObject for backward compatibility
+      ActiveSupport.const_set('BasicObject', ActiveSupport::ProxyObject)
     end
   end
 end
