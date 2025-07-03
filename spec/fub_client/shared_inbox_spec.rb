@@ -7,7 +7,7 @@ describe FubClient::SharedInbox do
   before do
     # Setup for cookie auth
     allow(client).to receive(:cookies).and_return('some_cookie=value')
-    allow(client).to receive(:subdomain).and_return('***REMOVED***')
+    allow(client).to receive(:subdomain).and_return('jdouglasproperties')
     allow(client).to receive(:use_cookies?).and_return(true)
   end
   
