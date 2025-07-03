@@ -121,6 +121,45 @@ cookie_client = FubClient::CookieClient.new(
 )
 ```
 
+#### Using sync-my-cookie Browser Extension for Cookie Encryption
+
+For secure cookie storage, you can use the [sync-my-cookie browser extension](https://github.com/Andiedie/sync-my-cookie) which uses kevast encryption in the backend:
+
+**Step 1: Install the sync-my-cookie browser extension**
+- Install from the Chrome Web Store or Firefox Add-ons
+- Or install from source: https://github.com/Andiedie/sync-my-cookie
+
+**Step 2: Configure and sync your cookies**
+1. Navigate to your FollowUpBoss subdomain and log in
+2. Open the sync-my-cookie browser extension
+3. Set up your encryption password/key
+4. Configure the extension to sync cookies to a GitHub GIST
+5. The extension will automatically encrypt and upload your cookies
+
+**Step 3: Get your GIST URL**
+The sync-my-cookie extension will create a GitHub GIST with encrypted cookie data in this format:
+```json
+{
+  "followupboss.com": "encrypted_hex_string_from_kevast"
+}
+```
+
+**Step 4: Use with FubClient**
+```ruby
+cookie_client = FubClient::CookieClient.new(
+  subdomain: 'your_subdomain',
+  gist_url: 'https://gist.githubusercontent.com/username/gist_id/raw/filename.json',
+  encryption_key: 'your_encryption_key'  # Same key used in sync-my-cookie
+)
+```
+
+The FubClient will automatically:
+- Fetch the encrypted data from the GIST
+- Decrypt it using the same kevast algorithm as sync-my-cookie (AES-128-CBC)
+- Process the cookie data for authentication
+
+This approach provides secure, encrypted storage of sensitive cookie data while keeping it accessible for your applications. The sync-my-cookie extension handles the complex cookie extraction, encryption, and GIST synchronization process automatically.
+
 ## Configuration
 
 ### Global Configuration

@@ -1,7 +1,5 @@
 # Her gem compatibility patch for Faraday 2.x
-# This file intercepts Her gem loading to prevent Faraday::Response::Middleware errors
 
-# First, try to create the missing Faraday::Response::Middleware class using const_set
 if defined?(Faraday) && !defined?(Faraday::Response::Middleware)
   middleware_class = Class.new(Faraday::Middleware) do
     def initialize(app, options = {})
@@ -14,13 +12,11 @@ if defined?(Faraday) && !defined?(Faraday::Response::Middleware)
   puts "[FubClient] Created Faraday::Response::Middleware using const_set"
 end
 
-# Override require to intercept Her middleware loading
 original_require = method(:require)
 
 define_method(:require) do |name|
   case name
   when 'her/middleware/parse_json'
-    # Define Her::Middleware::ParseJSON without loading the original file
     module Her
       module Middleware
         class ParseJSON < Faraday::Middleware
@@ -55,7 +51,6 @@ define_method(:require) do |name|
     puts "[FubClient] Intercepted and replaced her/middleware/parse_json"
     true
   when 'her/middleware/first_level_parse_json'
-    # Define Her::Middleware::FirstLevelParseJSON without loading the original file
     module Her
       module Middleware
         class FirstLevelParseJSON < Faraday::Middleware
@@ -90,7 +85,6 @@ define_method(:require) do |name|
     puts "[FubClient] Intercepted and replaced her/middleware/first_level_parse_json"
     true
   when /^her\/middleware\//
-    # For any other Her middleware files, try to load them normally but catch errors
     begin
       original_require.call(name)
     rescue NameError => e
@@ -102,7 +96,6 @@ define_method(:require) do |name|
       end
     end
   else
-    # For all other requires, use the original method
     original_require.call(name)
   end
 end
