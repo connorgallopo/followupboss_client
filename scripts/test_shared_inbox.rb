@@ -6,9 +6,9 @@ require 'pry'
 Dotenv.load
 
 # Load environment variables from .env file
-EMAIL = ENV['FUB_EMAIL'] || '***REMOVED***'
-PASSWORD = ENV['FUB_PASSWORD'] || '***REMOVED***'
-SUBDOMAIN = ENV['FUB_SUBDOMAIN'] || '***REMOVED***'
+EMAIL = ENV['FUB_EMAIL'] || 'your_email@example.com'
+PASSWORD = ENV['FUB_PASSWORD'] || 'your_password'
+SUBDOMAIN = ENV['FUB_SUBDOMAIN'] || 'your_subdomain'
 
 # Set debug mode
 ENV['DEBUG'] = 'true'
