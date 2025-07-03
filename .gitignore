@@ -15,3 +15,4 @@
 .env
 # VCR
 /spec/cassettes
+scripts/test_with_real_credentials.rb
