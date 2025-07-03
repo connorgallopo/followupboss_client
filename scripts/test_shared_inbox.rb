@@ -6,7 +6,7 @@ require 'pry'
 Dotenv.load
 
 # Load environment variables from .env file
-EMAIL = ENV['FUB_EMAIL'] || 'hnails@***REMOVED***.com'
+EMAIL = ENV['FUB_EMAIL'] || '***REMOVED***'
 PASSWORD = ENV['FUB_PASSWORD'] || '***REMOVED***'
 SUBDOMAIN = ENV['FUB_SUBDOMAIN'] || '***REMOVED***'
 

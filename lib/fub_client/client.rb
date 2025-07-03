@@ -105,7 +105,7 @@ module FubClient
         req.headers['Upgrade-Insecure-Requests'] = '1'
         
         # Add any cookies that might help
-        default_cookies = '***REMOVED***; ***REMOVED***'
+        default_cookies = '_ga=GA1.1.703376757.1744985902; _ga_J70LJ0E97T=GS1.1.1744990639.2.1.1744990766.0.0.0'
         req.headers['Cookie'] = default_cookies
         
         req.body = raw_data

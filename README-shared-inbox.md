@@ -33,7 +33,7 @@ client.subdomain = 'your_subdomain'
 The CookieClient comes pre-configured with a working cookie that can access shared inboxes without requiring login. It references a gist URL for possible future updates:
 
 ```
-***REMOVED***
+https://gist.githubusercontent.com/***REMOVED***/***REMOVED***/raw/fd866d47dbe218790b81884f12ad7e17bc9fe144/kevast-gist-default.json
 ```
 
 You can also specify your own cookie directly if needed:
@@ -89,7 +89,7 @@ client.subdomain = 'your_subdomain'
 
 The default gist URL is:
 ```
-***REMOVED***
+https://gist.githubusercontent.com/***REMOVED***/***REMOVED***/raw/fd866d47dbe218790b81884f12ad7e17bc9fe144/kevast-gist-default.json
 ```
 
 The JSON format for the cookie in the gist should be:

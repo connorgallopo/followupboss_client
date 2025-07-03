@@ -1,4 +1,116 @@
 module FubClient
+  # Module containing instance methods for SharedInbox objects
+  module SharedInboxMethods
+    # Get messages in this shared inbox - direct Faraday implementation
+    def messages(limit = 20, offset = 0)
+      # Support both Hash objects and model objects
+      inbox_id = self.is_a?(Hash) ? self[:id] : self.id
+      return [] unless inbox_id
+      
+      begin
+        conn = FubClient::SharedInbox.create_faraday_connection
+        return [] unless conn
+        
+        # Build query parameters
+        query = "?limit=#{limit}&offset=#{offset}"
+        
+        # Make the direct request
+        response = conn.get("/api/v1/sharedInboxes/#{inbox_id}/messages#{query}")
+        
+        if ENV['DEBUG']
+          puts "Fetching messages for inbox #{inbox_id}"
+          puts "Response status: #{response.status}"
+        end
+        
+        if response.status == 200
+          data = JSON.parse(response.body, symbolize_names: true)
+          messages = data[:messages] || []
+          puts "Found #{messages.count} messages" if ENV['DEBUG']
+          return messages
+        else
+          puts "Error: HTTP #{response.status} - #{response.body}" if ENV['DEBUG']
+          return []
+        end
+      rescue => e
+        puts "Error fetching messages: #{e.message}" if ENV['DEBUG']
+        puts e.backtrace.join("\n") if ENV['DEBUG']
+        return []
+      end
+    end
+    
+    # Get settings for this shared inbox - direct Faraday implementation
+    def settings
+      # Support both Hash objects and model objects
+      inbox_id = self.is_a?(Hash) ? self[:id] : self.id
+      return {} unless inbox_id
+      
+      begin
+        conn = FubClient::SharedInbox.create_faraday_connection
+        return {} unless conn
+        
+        # Make the direct request
+        response = conn.get("/api/v1/sharedInboxes/#{inbox_id}/settings")
+        
+        if ENV['DEBUG']
+          puts "Fetching settings for inbox #{inbox_id}"
+          puts "Response status: #{response.status}"
+        end
+        
+        if response.status == 200
+          data = JSON.parse(response.body, symbolize_names: true)
+          settings = data[:settings] || {}
+          puts "Settings retrieved successfully" if ENV['DEBUG']
+          return settings
+        else
+          puts "Error: HTTP #{response.status} - #{response.body}" if ENV['DEBUG']
+          return {}
+        end
+      rescue => e
+        puts "Error fetching settings: #{e.message}" if ENV['DEBUG']
+        puts e.backtrace.join("\n") if ENV['DEBUG']
+        return {}
+      end
+    end
+    
+    # Get conversations in this shared inbox - direct Faraday implementation
+    def conversations(limit = 20, offset = 0, filter = nil)
+      # Support both Hash objects and model objects
+      inbox_id = self.is_a?(Hash) ? self[:id] : self.id
+      return [] unless inbox_id
+      
+      begin
+        conn = FubClient::SharedInbox.create_faraday_connection
+        return [] unless conn
+        
+        # Build query parameters
+        query = "?limit=#{limit}&offset=#{offset}"
+        query += "&filter=#{URI.encode_www_form_component(filter)}" if filter
+        
+        # Make the direct request
+        response = conn.get("/api/v1/sharedInboxes/#{inbox_id}/conversations#{query}")
+        
+        if ENV['DEBUG']
+          puts "Fetching conversations for inbox #{inbox_id}"
+          puts "Response status: #{response.status}"
+        end
+        
+        if response.status == 200
+          data = JSON.parse(response.body, symbolize_names: true)
+          conversations = data[:conversations] || []
+          puts "Found #{conversations.count} conversations" if ENV['DEBUG']
+          return conversations
+        else
+          puts "Error: HTTP #{response.status} - #{response.body}" if ENV['DEBUG']
+          return []
+        end
+      rescue => e
+        puts "Error fetching conversations: #{e.message}" if ENV['DEBUG']
+        puts e.backtrace.join("\n") if ENV['DEBUG']
+        return []
+      end
+    end
+  end
+
   class SharedInbox < Resource
     collection_path "sharedInboxes"
     root_element :shared_inbox
@@ -132,6 +244,8 @@ module FubClient
           # Return data directly - it already contains what we need
           if data.is_a?(Hash) && !data.empty?
             puts "Found inbox with ID #{id} via direct request" if ENV['DEBUG']
+            # Extend the hash with SharedInbox instance methods
+            data.extend(SharedInboxMethods)
             return data
           else
             puts "Unexpected response structure: #{data.inspect}" if ENV['DEBUG']
