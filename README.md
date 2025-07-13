@@ -91,7 +91,15 @@ export FUB_API_KEY=your_api_key
 **Configuration Block:**
 ```ruby
 FubClient.configure do |config|
-  config.api_key = 'your_api_key'
+  # For Her-based resources
+  config.api_key = 'your_api_key_here'
+  
+  # Option 1: Direct cookie (use this OR the GIST option below, not both)
+  config.cookie = 'cookie string'
+
+  # Option 2: GIST + Encryption (cookie comes from encrypted GIST)
+  config.gist_url = "gist url"
+  config.encryption_key = "encryption key"
 end
 ```
 

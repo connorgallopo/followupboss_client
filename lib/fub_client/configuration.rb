@@ -3,11 +3,11 @@ module FubClient
     attr_accessor :api_key, :subdomain, :gist_url, :encryption_key, :cookie
 
     def initialize
-      @api_key = ENV['FUB_API_KEY']
-      @subdomain = ENV['FUB_SUBDOMAIN']
-      @gist_url = ENV['FUB_GIST_URL']
-      @encryption_key = ENV['FUB_ENCRYPTION_KEY']
-      @cookie = ENV['FUB_COOKIE']
+      @api_key = ENV['FUB_API_KEY'] if ENV['FUB_API_KEY']
+      @subdomain = ENV['FUB_SUBDOMAIN'] if ENV['FUB_SUBDOMAIN']
+      @gist_url = ENV['FUB_GIST_URL'] if ENV['FUB_GIST_URL']
+      @encryption_key = ENV['FUB_ENCRYPTION_KEY'] if ENV['FUB_ENCRYPTION_KEY']
+      @cookie = ENV['FUB_COOKIE'] if ENV['FUB_COOKIE']
     end
 
     def valid?
@@ -46,9 +46,17 @@ module FubClient
 
   def self.configure
     yield(configuration) if block_given?
+    # Reset the client's Her API to pick up new configuration
+    if defined?(FubClient::Client) && FubClient::Client.instance
+      FubClient::Client.instance.reset_her_api
+    end
   end
 
   def self.reset_configuration!
     @configuration = Configuration.new
+    # Also reset the client's Her API if it exists
+    if defined?(FubClient::Client) && FubClient::Client.instance
+      FubClient::Client.instance.reset_her_api
+    end
   end
 end

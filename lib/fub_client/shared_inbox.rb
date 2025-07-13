@@ -103,45 +103,18 @@ module FubClient
     root_element :shared_inbox
     include_root_in_json true
 
-    def self.all_inboxes
-      puts 'Calling SharedInbox.all_inboxes using direct cookie authentication' if ENV['DEBUG']
+    def self.all_inboxes(cookie_client: nil)
+      puts 'Calling SharedInbox.all_inboxes using cookie authentication' if ENV['DEBUG']
 
-      client = FubClient::Client.instance
-      cookies = client.cookies
-      subdomain = client.subdomain
+      client = resolve_cookie_client(cookie_client)
+      return [] unless client
 
-      if !cookies || cookies.empty?
-        puts 'Error: No cookies available for authentication' if ENV['DEBUG']
-        return []
-      end
+      conn = create_faraday_connection_from_client(client)
+      return [] unless conn
 
-      if !subdomain || subdomain.empty?
-        puts 'Error: No subdomain set for authentication' if ENV['DEBUG']
-        return []
-      end
-
-      conn = Faraday.new(url: "https://#{subdomain}.followupboss.com") do |f|
-        f.headers['Cookie'] = cookies
-        f.headers['Accept'] = 'application/json, text/javascript, */*; q=0.01'
-        f.headers['Accept-Language'] = 'en-US,en;q=0.9'
-        f.headers['X-Requested-With'] = 'XMLHttpRequest'
-        f.headers['X-System'] = 'fub-spa'
-        f.headers['User-Agent'] =
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
-        f.adapter :net_http
-      end
-
-      response = conn.get('/api/v1/sharedInboxes?showAllBypass=true&limit=20&offset=0')
+      response = conn.get('/api/v1/sharedInboxes?showAllBypass=true&limit=200&offset=0')
 
       if ENV['DEBUG']
-        puts 'Request headers:'
-        conn.headers.each do |k, v|
-          if k.downcase == 'cookie' && v.length > 50
-            puts "  #{k}: #{v[0..50]}..."
-          else
-            puts "  #{k}: #{v}"
-          end
-        end
         puts "Response status: #{response.status}"
         puts "Response body: #{response.body[0..100]}..." if response.body && response.body.length > 100
       end
@@ -149,7 +122,7 @@ module FubClient
       if response.status == 200
         data = JSON.parse(response.body, symbolize_names: true)
         inboxes = data[:sharedInboxes] || []
-        puts "Found #{inboxes.count} shared inboxes via direct request" if ENV['DEBUG']
+        puts "Found #{inboxes.count} shared inboxes via cookie client" if ENV['DEBUG']
         inboxes
       else
         puts "Error: HTTP #{response.status} - #{response.body}" if ENV['DEBUG']
@@ -161,33 +134,14 @@ module FubClient
       []
     end
 
-    def self.get_inbox(id)
-      puts "Calling SharedInbox.get_inbox(#{id}) using direct cookie authentication" if ENV['DEBUG']
+    def self.get_inbox(id, cookie_client: nil)
+      puts "Calling SharedInbox.get_inbox(#{id}) using cookie authentication" if ENV['DEBUG']
 
-      client = FubClient::Client.instance
-      cookies = client.cookies
-      subdomain = client.subdomain
+      client = resolve_cookie_client(cookie_client)
+      return nil unless client
 
-      if !cookies || cookies.empty?
-        puts 'Error: No cookies available for authentication' if ENV['DEBUG']
-        return nil
-      end
-
-      if !subdomain || subdomain.empty?
-        puts 'Error: No subdomain set for authentication' if ENV['DEBUG']
-        return nil
-      end
-
-      conn = Faraday.new(url: "https://#{subdomain}.followupboss.com") do |f|
-        f.headers['Cookie'] = cookies
-        f.headers['Accept'] = 'application/json, text/javascript, */*; q=0.01'
-        f.headers['Accept-Language'] = 'en-US,en;q=0.9'
-        f.headers['X-Requested-With'] = 'XMLHttpRequest'
-        f.headers['X-System'] = 'fub-spa'
-        f.headers['User-Agent'] =
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
-        f.adapter :net_http
-      end
+      conn = create_faraday_connection_from_client(client)
+      return nil unless conn
 
       response = conn.get("/api/v1/sharedInboxes/#{id}")
 
@@ -212,7 +166,7 @@ module FubClient
         end
 
         if data.is_a?(Hash) && !data.empty?
-          puts "Found inbox with ID #{id} via direct request" if ENV['DEBUG']
+          puts "Found inbox with ID #{id} via cookie client" if ENV['DEBUG']
           data.extend(SharedInboxMethods)
           data
         else
@@ -227,6 +181,170 @@ module FubClient
       puts "Error in get_inbox: #{e.message}" if ENV['DEBUG']
       puts e.backtrace.join("\n") if ENV['DEBUG']
       nil
+    end
+
+    def self.update_inbox(id, attributes, cookie_client: nil, merge_with_existing: true)
+      puts "Calling SharedInbox.update_inbox(#{id}) using cookie authentication" if ENV['DEBUG']
+
+      client = resolve_cookie_client(cookie_client)
+      return nil unless client
+
+      # If merge_with_existing is true, get current inbox data and merge
+      if merge_with_existing
+        current_inbox = get_inbox(id, cookie_client: client)
+        unless current_inbox
+          puts 'Error: Could not retrieve current inbox data for merging' if ENV['DEBUG']
+          return nil
+        end
+
+        # Create full payload by merging existing data with new attributes
+        full_payload = {
+          name: current_inbox[:name],
+          phones: current_inbox[:phones] || [],
+          users: current_inbox[:users] || [],
+          replyFrom: current_inbox[:replyFrom] || "",
+          replyFromPersonalized: current_inbox[:replyFromPersonalized] || false,
+          officeHoursBehaviorType: current_inbox[:officeHoursBehaviorType] || "Voicemail",
+          officeHoursForwardNumber: current_inbox[:officeHoursForwardNumber] || [],
+          incomingForwardTeam: current_inbox[:incomingForwardTeam] || [],
+          agentViewAll: current_inbox[:agentViewAll] || 0,
+          incomingForwardNumber: current_inbox[:incomingForwardNumber] || [],
+          incomingBehaviorType: current_inbox[:incomingBehaviorType] || "Voicemail",
+          unansweredForwardNumber: current_inbox[:unansweredForwardNumber] || []
+        }.merge(attributes)
+        
+        puts "Merged payload with existing data" if ENV['DEBUG']
+      else
+        full_payload = attributes
+        puts "Using provided attributes without merging" if ENV['DEBUG']
+      end
+
+      conn = create_faraday_connection_from_client(client)
+      return nil unless conn
+
+      response = conn.put do |req|
+        req.url "/api/v1/sharedInboxes/#{id}"
+        req.headers['Content-Type'] = 'application/json; charset=UTF-8'
+        req.headers['X-FUB-JS-Version'] = '198593'
+        req.body = JSON.generate(full_payload)
+      end
+
+      if ENV['DEBUG']
+        puts "Update response status: #{response.status}"
+        puts "Update response body: #{response.body[0..200]}..." if response.body && response.body.length > 200
+      end
+
+      if [200, 204].include?(response.status)
+        if response.status == 200 && !response.body.empty?
+          data = JSON.parse(response.body, symbolize_names: true)
+          puts "Updated inbox with ID #{id} via cookie client" if ENV['DEBUG']
+          data.extend(SharedInboxMethods) if data.is_a?(Hash)
+          data
+        else
+          puts "Updated inbox with ID #{id} (no response body)" if ENV['DEBUG']
+          true
+        end
+      else
+        puts "Error updating inbox: HTTP #{response.status} - #{response.body}" if ENV['DEBUG']
+        nil
+      end
+    rescue StandardError => e
+      puts "Error in update_inbox: #{e.message}" if ENV['DEBUG']
+      puts e.backtrace.join("\n") if ENV['DEBUG']
+      nil
+    end
+
+    def self.find_by_phone(phone_number, cookie_client: nil)
+      puts "Calling SharedInbox.find_by_phone(#{phone_number}) using cookie authentication" if ENV['DEBUG']
+
+      client = resolve_cookie_client(cookie_client)
+      return nil unless client
+
+      # Get all inboxes (now with limit=200, should cover all 142 inboxes)
+      inboxes = all_inboxes(cookie_client: client)
+      return nil if inboxes.empty?
+
+      # Normalize the phone number for comparison (remove formatting)
+      normalized_search = normalize_phone(phone_number)
+      
+      puts "Searching #{inboxes.length} inboxes for phone: #{phone_number} (normalized: #{normalized_search})" if ENV['DEBUG']
+
+      # Search through all inboxes for matching phone number
+      matching_inbox = inboxes.find do |inbox|
+        phones = inbox[:phones] || []
+        phones.any? do |phone_obj|
+          phone = phone_obj[:phone] || phone_obj['phone']
+          next false unless phone
+          
+          normalized_inbox_phone = normalize_phone(phone)
+          match = normalized_inbox_phone == normalized_search
+          
+          if ENV['DEBUG']
+            puts "  Checking inbox '#{inbox[:name]}' phone '#{phone}' (normalized: #{normalized_inbox_phone}) - Match: #{match}"
+          end
+          
+          match
+        end
+      end
+
+      if matching_inbox
+        puts "Found matching inbox: '#{matching_inbox[:name]}' (ID: #{matching_inbox[:id]})" if ENV['DEBUG']
+        matching_inbox.extend(SharedInboxMethods)
+        matching_inbox
+      else
+        puts "No inbox found with phone number: #{phone_number}" if ENV['DEBUG']
+        nil
+      end
+    rescue StandardError => e
+      puts "Error in find_by_phone: #{e.message}" if ENV['DEBUG']
+      puts e.backtrace.join("\n") if ENV['DEBUG']
+      nil
+    end
+
+
+    private_class_method def self.resolve_cookie_client(cookie_client)
+      # Use provided cookie_client or try to create one from configuration
+      client = cookie_client || create_cookie_client
+      
+      unless client
+        puts 'Error: No cookie client available for authentication' if ENV['DEBUG']
+        return nil
+      end
+      
+      client
+    end
+
+    private_class_method def self.normalize_phone(phone_number)
+      # Remove all non-digit characters for comparison
+      return '' unless phone_number
+      phone_number.to_s.gsub(/\D/, '')
+    end
+
+    def self.create_cookie_client
+      config = FubClient.configuration
+      return nil unless config.has_cookie_auth?
+      
+      begin
+        FubClient::CookieClient.new
+      rescue => e
+        puts "Error creating cookie client: #{e.message}" if ENV['DEBUG']
+        nil
+      end
+    end
+
+    def self.create_faraday_connection_from_client(cookie_client)
+      return nil unless cookie_client && cookie_client.cookies && cookie_client.subdomain
+
+      Faraday.new(url: "https://#{cookie_client.subdomain}.followupboss.com") do |f|
+        f.headers['Cookie'] = cookie_client.cookies
+        f.headers['Accept'] = 'application/json, text/javascript, */*; q=0.01'
+        f.headers['Accept-Language'] = 'en-US,en;q=0.9'
+        f.headers['X-Requested-With'] = 'XMLHttpRequest'
+        f.headers['X-System'] = 'fub-spa'
+        f.headers['User-Agent'] =
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
+        f.adapter :net_http
+      end
     end
 
     def self.create_faraday_connection

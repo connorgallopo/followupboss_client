@@ -6,9 +6,10 @@ module FubClient
     def initialize(subdomain: nil, gist_url: nil, encryption_key: nil, cookie: nil)
       config = FubClient.configuration
 
-      @subdomain = subdomain || config.subdomain
-      @gist_url = gist_url || config.gist_url
-      @encryption_key = encryption_key || config.encryption_key
+      @subdomain = subdomain || config.subdomain || ENV['FUB_SUBDOMAIN']
+      @gist_url = gist_url || config.gist_url || ENV['FUB_GIST_URL']
+      @encryption_key = encryption_key || config.encryption_key || ENV['FUB_ENCRYPTION_KEY']
+      cookie ||= config.cookie || ENV['FUB_COOKIE']
 
       raise ArgumentError, 'Subdomain is required for cookie authentication' unless @subdomain
 
@@ -26,7 +27,7 @@ module FubClient
 
     def cookies=(value)
       @cookies = value
-      client.cookies = value if @cookies
+      # Don't modify the global client anymore
     end
 
     def client
@@ -34,13 +35,33 @@ module FubClient
     end
 
     def configure_client
-      client.subdomain = @subdomain
-      client.cookies = @cookies
-      client.reset_her_api
+      # Don't modify the global client - create our own Her API instance
+      @her_api = create_cookie_her_api
     end
 
     def reset_her_api
-      client.reset_her_api
+      @her_api = create_cookie_her_api
+    end
+
+    def her_api
+      @her_api ||= create_cookie_her_api
+    end
+
+    private
+
+    def create_cookie_her_api
+      api_uri = URI::HTTPS.build(host: "#{@subdomain}.followupboss.com", path: "/api/#{FubClient::Client::API_VERSION}")
+      
+      her_api = Her::API.new
+      her_api.setup url: api_uri.to_s do |c|
+        # Use cookie authentication middleware with our cookies
+        c.use FubClient::Middleware::CookieAuthentication, cookies: @cookies
+        c.request :url_encoded
+        c.use FubClient::Middleware::Parser
+        c.adapter :net_http
+      end
+      
+      her_api
     end
 
     def fetch_cookie_from_gist

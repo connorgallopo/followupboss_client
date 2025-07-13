@@ -1,9 +1,23 @@
 module FubClient
   module Middleware
     class CookieAuthentication < Faraday::Middleware
+      def initialize(app, cookies: nil)
+        super(app)
+        @cookies = cookies
+      end
+      
       def call(env)
-        # Get the cookies from the client
-        cookies = FubClient::Client.instance.cookies
+        # Get the cookies from the parameter, client, or Her API instance
+        cookies = @cookies || FubClient::Client.instance.cookies
+        
+        # If still no cookies, try to get from the Her API instance
+        if (!cookies || cookies.empty?) && env[:request] && env[:request].respond_to?(:connection)
+          connection = env[:request].connection
+          if connection.respond_to?(:instance_variable_get)
+            api_cookies = connection.instance_variable_get(:@cookies)
+            cookies = api_cookies if api_cookies && !api_cookies.empty?
+          end
+        end
 
         if cookies && !cookies.empty?
           # CRITICAL: Must set a request header to enable cookie-based auth

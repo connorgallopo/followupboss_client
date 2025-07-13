@@ -9,10 +9,18 @@ module FubClient
     # Allow explicitly setting the instance (for testing)
     class << self
       attr_writer :instance
+      
+      # Convenience method to access configuration
+      def config
+        FubClient.configuration
+      end
+      
+      # Alias for configuration
+      def configuration
+        FubClient.configuration
+      end
     end
 
-    attr_writer :api_key
-    attr_accessor :cookies, :subdomain
     attr_reader :her_api
 
     def initialize
@@ -20,19 +28,40 @@ module FubClient
     end
 
     def api_key
-      @api_key ||= ENV['FUB_API_KEY']
+      return @api_key if defined?(@api_key) && @api_key
+      FubClient.configuration.api_key || ENV['FUB_API_KEY']
+    end
+
+    def api_key=(value)
+      @api_key = value
+    end
+
+    def subdomain
+      return @subdomain if defined?(@subdomain) && @subdomain
+      FubClient.configuration.subdomain || ENV['FUB_SUBDOMAIN']
+    end
+
+    def subdomain=(value)
+      @subdomain = value
+    end
+
+    def cookies
+      return @cookies if defined?(@cookies) && @cookies
+      FubClient.configuration.cookie || ENV['FUB_COOKIE']
+    end
+
+    def cookies=(value)
+      @cookies = value
     end
 
     def api_uri
-      return @api_uri if @api_uri
-
-      @api_uri = if subdomain
-                   # Use subdomain-specific URL for cookie-based auth
-                   URI::HTTPS.build(host: "#{subdomain}.followupboss.com", path: "/api/#{API_VERSION}")
-                 else
-                   # Use default API URL for API key auth
-                   URI::HTTPS.build(host: API_URL, path: "/#{API_VERSION}")
-                 end
+      if use_cookies? && subdomain
+        # Use subdomain-specific URL for cookie-based auth
+        URI::HTTPS.build(host: "#{subdomain}.followupboss.com", path: "/api/#{API_VERSION}")
+      else
+        # Use default API URL for API key auth
+        URI::HTTPS.build(host: API_URL, path: "/#{API_VERSION}")
+      end
     end
 
     # Login to obtain cookies
@@ -164,7 +193,8 @@ module FubClient
 
     # Use cookie authentication?
     def use_cookies?
-      !@cookies.nil? && !@cookies.empty?
+      current_cookies = cookies
+      !current_cookies.nil? && !current_cookies.empty?
     end
 
     # Reset the HER API connection with current settings
