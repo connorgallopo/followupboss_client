@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-07-13
+
+### Fixed
+- **Multi-authentication system improvements**
+  - Enhanced client authentication handling
+  - Improved cookie-based authentication flow
+  - Better authentication middleware integration
+  - Fixed authentication configuration issues
+
+### Enhanced
+- **SharedInbox functionality** with improved authentication support
+- **User authentication** with additional auth features
+- **Cookie client** with better multi-auth support
+- **Configuration system** for handling multiple authentication methods
+
+### Updated
+- Documentation with multi-auth usage examples
+- README with enhanced authentication guidance
+
 ## [1.0.0] - 2025-01-07
 
 ### Major Release - Enhanced Fork
